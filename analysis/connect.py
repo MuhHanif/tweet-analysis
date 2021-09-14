@@ -1,5 +1,6 @@
 from tweepy import OAuthHandler
 from tweepy import API
+from tweepy import Cursor
 import csv
 import sys
 
@@ -26,15 +27,15 @@ class twitterAuth():
     def authenticate(self):
         auth = OAuthHandler(tokenList[0][1], tokenList[1][1])
         auth.set_access_token(tokenList[2][1], tokenList[3][1])
-        return(auth)
+        api = API(auth,wait_on_rate_limit=True)
+        return(api)
 
+api = twitterAuth().authenticate()
 
-auth = twitterAuth().authenticate()
+tweets = Cursor(api.search, q=sys.argv[2], lang='id', tweet_mode="extended").items(20)
 
-api = API(auth)
+data = [result.full_text for result in tweets]
 
-public_tweets = api.home_timeline()
-for tweet in public_tweets:
-    print(tweet.text)
+[print(x) for x in data]
 
 #something to be added hehe
